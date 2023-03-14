@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: echoserver
+  namespace: echoserver
+spec:
+  selector:
+    matchLabels:
+      app: echoserver
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: echoserver
+    spec:
+      containers:
+        - image: openshift/origin-node
+          command:
+            - "/bin/socat"
+          args:
+            - TCP4-LISTEN:8080,reuseaddr,fork
+            - EXEC:'/bin/bash -c \"printf \\\"HTTP/1.0 200 OK\r\n\r\n\\\"; sed -e \\\"/^\r/q\\\"\"'
+          imagePullPolicy: Always
+          name: echoserver
+          ports:
+            - containerPort: 8080
